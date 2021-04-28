@@ -1,0 +1,258 @@
+%
+% @author   Shmish  "shmish90@gmail.com"
+% @legal    MIT     "(c) Christopher Schmitt"
+%
+
+
+\documentclass{article}
+
+
+%
+% Document Imports
+%
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+
+
+%
+% Document Configuration
+%
+
+\newcommand{\hwAuthor}{Christopher K. Schmitt}
+\newcommand{\hwSubject}{CS 463}
+\newcommand{\hwSection}{Section 01}
+\newcommand{\hwSemester}{Spring 2021}
+\newcommand{\hwAssignment}{Assignment 5}
+
+
+%
+% Document Environments
+%
+
+\setlength{\headheight}{65pt}
+\pagestyle{fancy}
+\lhead{\hwAuthor}
+\rhead{
+  \hwSubject \\
+  \hwSection \\
+  \hwSemester \\
+  \hwAssignment
+}
+
+\newenvironment{problem}[1]{
+  \nobreak\section*{Problem #1}
+}{}
+
+\newcommand*{\Let}[2]{\State #1 $\gets$ #2}
+\newcommand*{\bigO}[1]{\ensuremath{\mathcal{O}\left(#1\right)}}
+\newcommand*{\bigOmega}[1]{\ensuremath{\Omega\left(#1\right)}}
+\newcommand*{\bigTheta}[1]{\ensuremath{\Theta\left(#1\right)}}
+
+
+%
+% Document Start
+%
+
+\begin{document}
+  \begin{problem}{1}
+    In order to maximize profit, we can create a simple recursive
+    function that makes a cut at some position, $k$.  We are then
+    left with a rod of length $n - k$.  We recursively cut the rod
+    at every possible position, returning the optimal solution at
+    the end.  This approach is clearly exponential time, but
+    involves re-computing potions of the pipe at each step.  We
+    can eliminate this with a "bottom-up" approach.  We can create
+    a temporary array to store the solutions of sub-problems and
+    avoid re-computing them.  We start by solving for the smaller
+    rods, as they will be used to create our solution.
+
+    \begin{algorithm}
+      \caption{Rod Cutting}
+      \begin{algorithmic}[1]
+        \Function{cut}{$cost$, $n$}
+          \Let{$temp$}{$[0, \dotso, n]$}
+          \For{$i = 1$ to $n$}
+            \Let{$x$}{$-\infty$}
+            \For{$j = 1$ to $i$}
+              \Let{$x$}{MAX($x, cost[j] + temp[i - j]$)}
+            \EndFor
+            \Let{$temp[i]$}{$x$}
+          \EndFor
+          \State \Return $temp[n]$
+        \EndFunction
+      \end{algorithmic}
+    \end{algorithm}
+
+    This algorithm belongs to \bigO{n^2} because the MAX function
+    and the innermost addition are both constant time.  We can
+    therefore solve for the running-time with the following 
+    sigma-expression.
+
+    \begin{displaymath}
+      \sum_{i = 1}^{n} \sum_{j = 1}^{i} 1 = \frac{n^2 + n}{2} \in \bigO{n^2}
+    \end{displaymath}
+
+    The top-down approach (memoization) has identical performance
+    characteristics, but uses a recursive method instead of an
+    iterative one.
+  \end{problem}
+
+  \pagebreak
+
+  \begin{problem}{2}
+    To compute the number of unique paths, we can use a naïve 
+    recursive algorithm to solve this problem in exponential time.  
+    This would involve re-computing the number of unique paths in
+    identical sub-grids several times.  To eliminate this, we can
+    store the number of unique paths to get from any point to the
+    destination in an $m \times n$ matrix.  We can then use a
+    bottom-up approach to fill the matrix, starting from the 
+    destination and iterating up to the start.
+
+    \begin{algorithm}
+      \caption{Unique Paths}
+      \begin{algorithmic}[1]
+        \Function{paths}{$m, n$}
+          \Let{temp}{$\begin{pmatrix}
+            0_{0,0} & 0_{0,1} & \cdots & 0_{0,n-1} \\
+            0_{1,0} & 0_{1,1} & \cdots & 0_{1,n-1} \\
+            \vdots  & \vdots  & \ddots & \vdots  \\
+            0_{m-1,0} & 0_{m-1,1} & \cdots & 0_{m-1,n-1} 
+            \end{pmatrix}$}
+
+          \For{$i = 0$ to $m$}
+            \Let{temp[$i$][0]}{1}
+          \EndFor
+
+          \For{$i = 0$ to $n$}
+            \Let{temp[0][$i$]}{1}
+          \EndFor
+
+          \For{$i = 1$ to $m$}
+            \For{$j = 0$ to $n$}
+              \Let{temp[$i$][$j$]}{temp[$i - 1$][$j$] + temp[$i$][$j - 1$]}
+            \EndFor
+          \EndFor
+          \State \Return temp[$m - 1$][$n - 1$]
+        \EndFunction
+      \end{algorithmic}
+    \end{algorithm}
+
+    This algorithm belongs to \bigO{n \cdot m}, which we can see by solving
+    the following sigma expression.
+
+    \begin{displaymath}
+      m + n + \sum_{i = 1}^{m} \sum_{j = 0}^{n} 1 = m(n + 1) + m + n = nm + 2m + n \in \bigO{nm}
+    \end{displaymath}
+
+    It should that this relation only holds as long as $n \ge 2$.
+    Using combinatorics, we can find an even cleaner solution.
+    We can use the formula $\binom{m + n - 2}{n - 1}$.  Subbing in
+    $5$ and $6$ for $m$ and $n$ gives us $\binom{9}{5} = 126$.
+  \end{problem}
+
+  \pagebreak
+
+  \begin{problem}{3}
+    Suppose we create a function, $f(i, j)$, that return the maximum
+    profit path from the bottom to row to $(i, j)$.  This function 
+    will use the value $p(i, j)$ plus the result from the previous
+    row.  In this manner, we can avoid re-computing previous rows by
+    filling a matrix in a bottom-up manner.  A simpler solution 
+    however, would be to memoize the recursive definition.  We can
+    construct a recursive definition like so.
+
+    \begin{displaymath}
+      f(i, j) = \begin{cases}
+        -\infty & j < 0 \\
+        -\infty & j \ge n \\
+        p(i, j) & i = 0 \\
+        max(f(i - 1, j - 1), f(i - 1, j), f(i, j - 1)) + p(i, j) & otherwise
+      \end{cases}
+    \end{displaymath}
+
+    By using the definition, we can see that this is an exponential
+    time computation.  However, memoization will mean that we only
+    check each ordered pair once.  On an $n \times n$ board, this
+    would put us at \bigO{n^2} complexity.  To construct the path, we
+    can create an algorithm like this.
+
+    \begin{algorithm}
+      \caption{Checkerboard}
+      \begin{algorithmic}[1]
+        \Function{construct}{$i, j, memo, path$}
+          \If{i = 0}
+            \State \Return path
+          \EndIf
+          \Let{a}{memo[i - 1][j - 1] or construct(i - 1, j - 1, memo, path)}
+          \Let{b}{memo[i - 1][j] or construct(i - 1, j, memo, path)}
+          \Let{c}{memo[i][j - 1] or construct(i, j - 1, memo, path)}
+          \Let{memo[i][j]}{max(a, b, c) + p(i, j)}
+          \State path.push(j)
+          \State \Return construct(i - 1, j, memo, path)
+        \EndFunction
+      \end{algorithmic}
+    \end{algorithm}
+  \end{problem}
+
+  \pagebreak
+
+  \begin{problem}{4}
+    We can either include or exclude each element in the knapsack.
+    We could use a simple recursive solution to explore every 
+    possible combination of includes.  Without memoization, this
+    would involve re-computing many include-exclude combinations.  We
+    can instead build a table in a bottom-up manner to avoid this
+    needless work.
+
+    Our algorithm will begin by populating a table with the base
+    case.  Since we cannot add items when we have none to choose
+    from, the solution for the first row is always zero.  At each
+    row, $i$, we will compute the maximum value we could get by
+    including the the $i$'th element.  This will be equal to 
+    $temp[i-1][j] + value[i]$.
+
+    \begin{algorithm}
+      \caption{knapsack}
+      \begin{algorithmic}[1]
+        \Function{knapsack}{$n, w, weight, value$}
+          \Let{temp}{$\begin{pmatrix}
+            0_{0,0} & 0_{0,1} & \cdots & 0_{0,1} \\
+            0_{1,0} & 0_{1,1} & \cdots & 0_{1,n} \\
+            \vdots  & \vdots  & \ddots & \vdots  \\
+            0_{w,0} & 0_{w,1} & \cdots & 0_{w,n} 
+            \end{pmatrix}$}
+
+          \For{$i = 1$ to $n$}
+            \For{$j = 1$ to $w$}
+              \Let{max exclude}{temp[$i - 1$][$j$]}
+              \Let{max include}{$-\infty$}
+              \If{weight[$i$] $<$ $j$} \Comment{If the knapsack can fit the item}
+                \Let{max include}{value[$i$] $+$ temp[i][j - weight[$i$]]}
+              \EndIf
+
+              \Let{temp[i][j]}{max(max include, max exclude)}
+            \EndFor
+          \EndFor
+
+          \State \Return temp[$n$][$w$]
+        \EndFunction
+      \end{algorithmic}
+    \end{algorithm}
+
+    This algorithm fills every entry in a $|value| \times |weight|$ 
+    table.  If the size of these collections are $n$ and $w$ 
+    respectively, then the complexity of this algorithm is \bigO{nw}.
+    With the given conditions, the maximum knapsack value is 75.
+  \end{problem}
+\end{document}

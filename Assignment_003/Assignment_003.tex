@@ -1,0 +1,140 @@
+%
+% @author   Shmish  "shmish90@gmail.com"
+% @legal    MIT     "(c) Christopher Schmitt"
+%
+
+
+\documentclass{article}
+
+
+%
+% Document Imports
+%
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+
+
+%
+% Document Configuration
+%
+
+\newcommand{\hwAuthor}{Christopher K. Schmitt}
+\newcommand{\hwSubject}{CS 463}
+\newcommand{\hwSection}{Section 01}
+\newcommand{\hwSemester}{Spring 2021}
+\newcommand{\hwAssignment}{Assignment 3}
+
+
+%
+% Document Environments
+%
+
+\setlength{\headheight}{65pt}
+\pagestyle{fancy}
+\lhead{\hwAuthor}
+\rhead{
+  \hwSubject \\
+  \hwSection \\
+  \hwSemester \\
+  \hwAssignment
+}
+
+\newenvironment{problem}[1]{
+  \nobreak\section*{Problem #1}
+}{}
+
+\newcommand*{\bigO}[1]{\ensuremath{\mathcal{O}\left(#1\right)}}
+\newcommand*{\bigOmega}[1]{\ensuremath{\Omega\left(#1\right)}}
+\newcommand*{\bigTheta}[1]{\ensuremath{\Theta\left(#1\right)}}
+
+
+%
+% Document Start
+%
+
+\begin{document}
+  \begin{problem}{1}
+    To compute $A \cup B$, we begin with an empty set, $C$.  We copy
+    every element of $A$ into $C$.  This takes $\bigO{m}$ time.
+    Next, we sort $A$ in $\bigO{m\log{m}}$ time.  This step will
+    enable us to perform binary search on $A$ in $\bigO{\log{m}}$
+    time.  For each element of $B$, perform binary search on $A$.
+    If the element is not found in $A$, add it to $C$.  This takes
+    $\bigO{n\log{m}}$ time, since we preform $n$ binary searches.
+    This totals $m + m\log{m} + n\log{m}$, or simply \bigO{n\log{m}}.
+
+    To compute $A \cap B$, we again start with an empty set, $C$.  We
+    start by sorting $A$, again in \bigO{m\log{m}} time.  For every
+    element of $B$, perform binary search on $A$.  This will total
+    \bigO{n\log{m}} time.  If the element of $B$ is found in $A$, add
+    it to $C$.  This will take a total of $m\log{m} + n\log{m}$ time,
+    or just \bigO{n\log{m}}.
+  \end{problem}
+
+  \begin{problem}{2}
+    Because the intervals are disjoint, we can define a strict
+    ordering by sorting them either their upper or lower bounds.  We
+    will choose to sort by the lower bound here.  This takes
+    \bigO{q\log{q}} time.  Next, create an empty list of size $q$ and
+    initialize each cell to zero.  This takes \bigO{q} time.  For
+    each element of $X$, identify the interval it belongs to by the
+    following method: select the center interval.  If the element of
+    $X$ is in the center interval, increment the corresponding cell
+    in the list by one.  If the element of $X$ is greater than the
+    intervals upper bound, perform the same operation with endpoints
+    at the current interval and last interval, recursively.  If the
+    element of $X$ is less than the lower bound of the interval,
+    perform the same operation with endpoints at the current interval
+    and the first interval, recursively.  Because this is just a
+    modified binary search, it runs in \bigO{\log{q}} time.  If we
+    do this for every element of $X$, we will have a total of
+    $q\log{q} + n\log{q}$ or just \bigO{n\log{q}}.
+  \end{problem}
+
+  \begin{problem}{3}
+    Because the list can be pre-processed to contain a list of pairs
+    in the form of (index, value).  Therefore, finding the maximum
+    element and the index of the maximum element are the same thing.
+    The following algorithm will Therefore simply identify the 
+    maximum element of a list, as that is a cleaner solution.
+
+    \begin{algorithm}[H]
+      \caption{Return the maximum element of a list recursively}
+      \begin{algorithmic}
+        \Function{findMax}{list}
+          \If{list.length = 1}
+            \State \Return list[0]
+          \Else
+            \State lhs $\gets$ findMax(list[0 .. list.length / 2])
+            \State rhs $\gets$ findMax(list[list.length / 2 ..])
+            \State \Return max(lhs, rhs)
+          \EndIf
+        \EndFunction
+      \end{algorithmic}
+    \end{algorithm}
+
+    This algorithm calls itself twice on an array of half the size
+    in the recursive case.  We can establish the following recurrence
+    relation.  Note that comparison is constant time.
+
+    \begin{displaymath}
+      T(n) = 2 \cdot T\left(\frac{n}{2}\right) + 1
+    \end{displaymath}
+
+    This is a trivial case one of the master theorem (because 
+    $c = 1$ and $c < \log_2{2}$). By the master theorem, this
+    algorithm belongs in \bigTheta{n^{\log_2{2}}}, or just
+    \bigTheta{n}.  This is the same complexity as the brute-force
+    method.
+  \end{problem}
+\end{document}

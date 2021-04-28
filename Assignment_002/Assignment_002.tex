@@ -1,0 +1,218 @@
+%
+% @author   Shmish  "shmish90@gmail.com"
+% @legal    MIT     "(c) Christopher Schmitt"
+%
+
+
+\documentclass{article}
+
+
+%
+% Document Imports
+%
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{color}
+\usepackage{tikz}
+
+
+
+%
+% Document Configuration
+%
+
+\newcommand{\hwAuthor}{Christopher K. Schmitt}
+\newcommand{\hwSubject}{CS 463}
+\newcommand{\hwSection}{Section 01}
+\newcommand{\hwSemester}{Spring 2021}
+\newcommand{\hwAssignment}{Assignment 2}
+
+
+%
+% Document Environments
+%
+
+\setlength{\headheight}{65pt}
+\pagestyle{fancy}
+\lhead{\hwAuthor}
+\rhead{
+  \hwSubject \\
+  \hwSection \\
+  \hwSemester \\
+  \hwAssignment
+}
+
+\newenvironment{problem}[1]{
+  \nobreak\section*{Problem #1}
+}{}
+
+\newcommand*{\bigO}[1]{\ensuremath{\mathcal{O}\left(#1\right)}}
+\newcommand*{\bigOmega}[1]{\ensuremath{\Omega\left(#1\right)}}
+\newcommand*{\bigTheta}[1]{\ensuremath{\Theta\left(#1\right)}}
+
+
+%
+% Document Start
+%
+
+\begin{document}
+  \begin{problem}{1}
+    The order of growth is $\bigTheta{n^3}$.  The innermost operation,
+    $RESULT++$, is constant or $\bigTheta{1}$.  It is contained within
+    a loop which is grows linearly with respect to $j$.  This loop is
+    therefore $\bigTheta{j}$.  The middle loop is linear with respect
+    to $i$, and is therefore $\bigTheta{i}$.  The outermost loop is
+    linear with respect to $n$, and is therefore $\bigTheta{n}$.
+    This gives us $\bigTheta{n * i * j * 1}$, or (with substitution)
+    $\bigTheta{n * n * n * 1} = \bigTheta{n^3}$.  This can also be
+    found by solving the summation expression.
+    \begin{displaymath}
+      \sum_{i = 0}^{n + 1} \sum_{j = 2}^{i} \sum_{k = 3}^{j - 1} 1
+    \end{displaymath}
+
+    Simplifying
+    \begin{displaymath}
+      \begin{split}
+        \sum_{i = 0}^{n + 1} \sum_{j = 2}^{i} \sum_{k = 3}^{j - 1} 1 \\
+        \sum_{i = 0}^{n + 1} \sum_{j = 2}^{i} j - 3 \\
+        \sum_{i = 0}^{n + 1} \frac{i^2}{2} + \frac{i}{2} - 4 \\
+        \frac{n^3}{6} + \frac{3n^2}{4} + \frac{13n}{12} - \frac{7}{2}
+      \end{split}
+    \end{displaymath}
+  \end{problem}
+
+  \begin{problem}{2 (a)}
+    \begin{proof}
+      $ $\\
+      Start by breaking the expression down into a geometric series and
+      a simple sum.  Then combine terms.
+      \begin{displaymath}
+        \sum_{i = 0}^{n - 1} 2i(i + 1) = 2\sum_{i = 0}^{n - 1} i^2 + 2\sum_{i = 0}^{n - 1} i = \frac{2}{3}(n - 1) \cdot (n^2 + n)
+      \end{displaymath}
+      Next, rearrange the expression such that it is a sum of powers,
+      leading with the highest order term.
+      \begin{displaymath}
+        \frac{2}{3}(n - 1) \cdot (n^2 + n) = \frac{2n^3}{3} - \frac{2n}{3}
+      \end{displaymath}
+      Since the right-hand side of the sum is both lower-order and negative, it
+      can be ignored, leaving us with $\frac{2}{3}n^3$, therefore the expression
+      is $\bigTheta{n^3}$.
+      $ $\\
+    \end{proof}
+  \end{problem}
+
+  \begin{problem}{2 (b)}
+    \begin{proof}
+      $ $\\
+      We start by solving the innermost sum in terms of $i$.  This gives us
+      \begin{displaymath}
+        \sum_{j = 0}^{i} i + j = \frac{3i^2+3i}{2}
+      \end{displaymath}
+      Substituting this expression in for the innermost sum and expanding gives
+      \begin{displaymath}
+        \sum_{i = 1}^{n + 1} \frac{3i^2+3i}{2} = \frac{n^3 + 6n^2 + 11n + 6}{2}
+      \end{displaymath}
+      The highest order term in the polynomial is $\frac{3}{2} \cdot n$.  Therefore
+      the order of growth is $\bigTheta{n^3}$.
+      $ $\\
+    \end{proof}
+  \end{problem}
+
+  \begin{problem}{3 (a)}
+    \begin{equation*}
+      \begin{split}
+        T(n) = T(n - 1) + 10 & = T(n - 2) + 20 \\
+        & = T(n - 3) + 30 \\
+        & = T(n - 4) + 40 \\
+        & \vdots \\
+        & = T(n - k) + 10k
+      \end{split}
+    \end{equation*}
+    Setting the initial conditions and solving gives us
+    \begin{displaymath}
+      T(n) = 10n - 10 = \bigTheta{n}
+    \end{displaymath}
+  \end{problem}
+
+  \begin{problem}{3 (b)}
+    \begin{equation*}
+      \begin{split}
+        T(n) = 2T(n - 1) & = 4T(n - 2) \\
+        & = 8T(n - 3) \\
+        & = 16T(n - 4) \\
+        & \vdots \\
+        & = 2^kT(n - k)
+      \end{split}
+    \end{equation*}
+    Setting the initial conditions and solving gives us
+    \begin{displaymath}
+      T(n) = 2^{n + 1} = \bigTheta{2^{n + 1}}
+    \end{displaymath}
+  \end{problem}
+
+  \begin{problem}{3 (c)}
+    \begin{equation*}
+      \begin{split}
+        T(n) = T(n - 1) + n & = T(n - 2) + n - 1 \\
+        & = T(n - 3) + n - 2 \\
+        & = T(n - 4) + n - 3 \\
+        & \vdots \\
+        & = T(n - k) + (n - k + 1)
+      \end{split}
+    \end{equation*}
+    Setting the initial conditions and solving gives us
+    \begin{displaymath}
+      T(n) = \frac{n^2 + n}{2} = \bigTheta{n^2}
+    \end{displaymath}
+  \end{problem}
+
+  \begin{problem}{3 (d)}
+    \begin{equation*}
+      \begin{split}
+        T(n) = 4T(\frac{n}{2}) & = 16T(\frac{n}{4}) \\
+        & \vdots \\
+        & = n^2T(\frac{n}{(n - 1)^2})
+      \end{split}
+    \end{equation*}
+    Setting the initial conditions and solving gives us
+    \begin{displaymath}
+      T(n) = n^2 = \bigTheta{n^2}
+    \end{displaymath}
+  \end{problem}
+
+  \begin{problem}{3 (e)}
+    This is case one of the master theorem.  The relation is in
+    the form $aT(\frac{n}{b}) + f(n)$, where $a = 3$, $b = 3$, and
+    $f(n) = n$.  The master theorem tells us that this is $\bigTheta{n^{\log_33}}$
+    or $\bigTheta{n^1} = \bigTheta{n}$
+  \end{problem}
+
+  \begin{problem}{4}
+    The algorithm recursively divides the list in two, giving
+    us $2T\left(\frac{n}{2}\right)$.  Merging two sub-lists takes
+    $n$ time. The recurrence relation is as follows
+    \begin{displaymath}
+      T(n) = 2T\left(\frac{n}{2}\right) + n
+    \end{displaymath}
+
+    Solving the relation
+    \begin{displaymath}
+      \begin{split}
+        T(n) & = 2T\left(\frac{n}{2}\right) + n \\
+        & = 4T\left(\frac{n}{4}\right) + 2n \\
+        & = 8T\left(\frac{n}{8}\right) + 3n \\
+        & \vdots \\
+        & = nT\left(\frac{n}{n}\right) + n\log n
+      \end{split}
+    \end{displaymath}
+
+    \begin{displaymath}
+      T(n) = 2T\left(\frac{n}{2}\right) + n = \bigTheta{n\log{n}}
+    \end{displaymath}
+  \end{problem}
+\end{document}

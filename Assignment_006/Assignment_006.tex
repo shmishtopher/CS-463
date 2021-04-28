@@ -1,0 +1,271 @@
+%
+% @author   Shmish  "shmish90@gmail.com"
+% @legal    MIT     "(c) Christopher Schmitt"
+%
+
+
+\documentclass{article}
+
+
+%
+% Document Imports
+%
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+
+
+%
+% Document Configuration
+%
+
+\newcommand{\hwAuthor}{Christopher K. Schmitt}
+\newcommand{\hwSubject}{CS 463}
+\newcommand{\hwSection}{Section 01}
+\newcommand{\hwSemester}{Spring 2021}
+\newcommand{\hwAssignment}{Assignment 6}
+
+
+%
+% Document Environments
+%
+
+\setlength{\headheight}{65pt}
+\pagestyle{fancy}
+\lhead{\hwAuthor}
+\rhead{
+  \hwSubject \\
+  \hwSection \\
+  \hwSemester \\
+  \hwAssignment
+}
+
+\newenvironment{problem}[1]{
+  \nobreak\section*{Problem #1}
+}{}
+
+\newcommand*{\Let}[2]{\State #1 $\gets$ #2}
+\newcommand*{\bigO}[1]{\ensuremath{\mathcal{O}\left(#1\right)}}
+\newcommand*{\bigOmega}[1]{\ensuremath{\Omega\left(#1\right)}}
+\newcommand*{\bigTheta}[1]{\ensuremath{\Theta\left(#1\right)}}
+
+
+%
+% Document Start
+%
+
+\begin{document}
+  \begin{problem}{1}
+    We can use a greedy approach to develop an efficient solution to
+    the fractional knapsack problem.  To determine the most 
+    profitable configuration, we will start by computing the ratio
+    of the value to the weight for each item.  We can then sort items
+    by their value to weight ration and pull items out of the list
+    and into our knapsack until we reach the weight limit.  For the
+    final item in the knapsack, we may need to place a fractional
+    item.  This is not the case for the other items, as it would not
+    make sense to include a fraction of a more valuable item until
+    we either run out of space or consume the entire item.
+
+    \begin{algorithm}
+      \caption{Fractional Knapsack}
+      \begin{algorithmic}[1]
+        \Function{knapsack}{weights, values, capacity}
+          \Let{items}{$(r_i : r_i = values[i] / weights[i])$}
+          \Let{knapsack}{empty set}
+
+          \While{$capacity > 0$}
+            \Let{$maximum_i$}{$max(items)$}
+            \If{$capacity \ge weights[i]$}
+              \State knapsack.push($values[i]$)
+              \Let{$capacity$}{$capacity - weights[i]$}
+              \State remove items[$i$]
+              \State remove weights[$i$]
+              \State remove values[$i$]
+            \Else
+              \Let{ratio}{$capacity / weight[i]$}
+              \State knapsack.push($radio \cdot values[i]$)
+              \Let{$capacity$}{$0$}
+            \EndIf
+          \EndWhile
+          \State \Return $knapsack$
+        \EndFunction
+      \end{algorithmic}
+    \end{algorithm}
+  \end{problem}
+
+  \pagebreak
+
+  \begin{problem}{2}
+    \begin{center}
+      \begin{tabular}{||c c c c||} 
+      \hline
+      Step & $V$ & $MST$ & Weights \\
+      \hline\hline
+      0 & $\{1, 2, 3, 4, 5\}$ & $\{\}$ & $(0, \infty, \infty, \infty, \infty)$ \\ 
+      \hline
+      1 & $\{2, 3, 4, 5\}$ & $\{1\}$ & $(0, 11, 4, 2, \infty)$ \\ 
+      \hline
+      2 & $\{2, 3, 5\}$ & $\{1, 4\}$ & $(0, 11, 4, 2, 7)$ \\
+      \hline
+      3 & $\{2, 5\}$ & $\{1, 4, 3\}$ & $(0, 11, 4, 2, 5)$ \\
+      \hline
+      4 & $\{2\}$ & $\{1, 4, 3, 5\}$ & $(0, 11, 4, 2, 7)$ \\
+      \hline
+      5 & $\{\}$ & $\{1, 4, 3, 5, 2\}$ & $(0, 11, 4, 2, 7)$ \\
+      \hline
+     \end{tabular}
+    \end{center}
+
+    \begin{center}
+      \begin{tikzpicture}
+        \path node[draw, circle] (1) at ({360 / 5 * (1 - 1)}:3) {$1$};
+        \path node[draw, circle] (2) at ({360 / 5 * (1 - 2)}:3) {$2$};
+        \path node[draw, circle] (3) at ({360 / 5 * (1 - 3)}:3) {$3$};
+        \path node[draw, circle] (4) at ({360 / 5 * (1 - 4)}:3) {$4$};
+        \path node[draw, circle] (5) at ({360 / 5 * (1 - 5)}:3) {$5$};
+
+        \draw (1) -- (4);
+        \draw (4) -- (3);
+        \draw (4) -- (2);
+        \draw (3) -- (5);
+      \end{tikzpicture}
+    \end{center}
+  \end{problem}
+
+  \pagebreak
+
+  \begin{problem}{3}
+    \begin{center}
+      \begin{tikzpicture}
+        \Tree [.{$0.06$}
+          {$(f, 0.02)$}
+          {$(g, 0.04)$}
+        ]
+      \end{tikzpicture}
+    \end{center}
+
+    \begin{center}
+      \begin{tikzpicture}
+        \Tree [.{$0.16$}
+          [.{$0.06$}
+            {$(f, 0.02)$}
+            {$(g, 0.04)$}
+          ]
+          [.{$0.10$}
+            {$(a, 0.05)$}
+            {$(c, 0.05)$}
+          ]
+        ]
+      \end{tikzpicture}
+    \end{center}
+
+    \begin{center}
+      \begin{tikzpicture}
+        \Tree [.{$1.00$}
+          [.{$0.84$}
+            {$(e, 0.45)$}
+            [.{$0.39$}
+              {$(d, 0.20)$}
+              {$(b, 0.19)$}
+            ]
+          ]
+          [.{$0.16$}
+            [.{$0.06$}
+              {$(f, 0.02)$} 
+              {$(g, 0.04)$}
+            ]
+            [.{$0.10$} 
+              {$(a, 0.05)$}
+              {$(c, 0.05)$}
+            ]
+          ]
+        ]
+      \end{tikzpicture}
+    \end{center}
+
+    \begin{center}
+      \begin{tabular}{||c c c||} 
+      \hline
+      Symbol & Code & Frequency \\
+      \hline\hline
+      a & 001 & 0.05 \\ 
+      \hline
+      b & 100 & 0.19 \\ 
+      \hline
+      c & 000 & 0.05 \\ 
+      \hline
+      d & 101 & 0.20 \\ 
+      \hline
+      e & 11 & 0.45 \\ 
+      \hline
+      f & 011 & 0.02 \\ 
+      \hline
+      g & 010 & 0.04 \\ 
+      \hline
+     \end{tabular}
+    \end{center}
+
+    \begin{displaymath}
+      \mathcal{L} = 3 \cdot 0.05 + 3 \cdot 0.19 + 3 \cdot 0.05 + 3 \cdot 0.20 + 2 \cdot 0.45 + 3 \cdot 0.02 + 3 \cdot 0.04 = 2.55
+    \end{displaymath}
+  \end{problem}
+
+  \pagebreak
+
+  \begin{problem}{4}
+    \begin{center}
+      \begin{tabular}{||c c c c c c||}
+        \hline
+        Round & m1 & m2 & m3 & m4 & m5 \\
+        \hline\hline
+        0 & | & | & | & | & | \\
+        \hline
+        1 & w3 & w4 & | & w1 & w5 \\
+        \hline
+        2 & w3 & | & w1 & w4 & w5 \\
+        \hline
+        3 & w3 & | & w1 & w4 & w5 \\
+        \hline
+        4 & w3 & w1 & | & w4 & w5 \\
+        \hline
+        5 & w3 & w1 & | & w4 & w5 \\
+        \hline
+        6 & w3 & w1 & w2 & w4 & w5 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \begin{center}
+      Results
+    \end{center}
+
+    \begin{center}
+      \begin{tabular}{||c c||}
+        \hline
+        $M_i$ & $W_i$ \\
+        \hline\hline
+        1 & 3 \\
+        \hline
+        2 & 1 \\
+        \hline
+        3 & 2 \\
+        \hline
+        4 & 4 \\
+        \hline
+        5 & 5 \\
+        \hline
+      \end{tabular}
+    \end{center}
+  \end{problem}
+\end{document}
